@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scheduler with Multi-Select and Full Drag-and-Drop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #666;
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scheduler {
+      display: flex;
+      gap: 10px;
+      height: 90vh;
+    }
+
+    .projects-wrapper {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr); /* 5 projects per row */
+      gap: 10px;
+      flex: 1;
+      overflow-y: auto;
+      background: #555;
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 100%;
+    }
+
+    .project {
+      background: #333;
+      color: #fff;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
+      cursor: grab;
+    }
+
+    .project-header {
+      background: #000;
+      padding: 10px;
+      font-weight: bold;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      font-size: 12px;
+      height: 80px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .dropzone {
+      flex-grow: 1;
+      background: #444;
+      padding: 5px;
+      border-radius: 0 0 5px 5px;
+      overflow-y: auto;
+      min-height: 100px;
+    }
+
+    .pump-crew {
+      background: #222;
+      padding: 5px;
+      margin-top: 5px;
+      border-radius: 5px;
+      overflow-y: auto;
+      min-height: 50px;
+      position: relative;
+    }
+
+    .pump-crew-title {
+      cursor: pointer;
+      font-weight: bold;
+      color: yellow;
+    }
+
+    .employee,
+    .assigned {
+      background: #555;
+      margin: 5px;
+      padding: 5px;
+      border-radius: 3px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .employee.selected {
+      background: #777;
+      border: 2px solid #fff;
+    }
+
+    .employee span.name,
+    .assigned span.name {
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .employee:hover,
+    .assigned:hover {
+      background: #777;
+    }
+
+    .assigned.green {
+      background: green;
+      color: white;
+    }
+
+    .assigned.blue {
+      background: blue;
+      color: white;
+    }
+
+    .assigned.red {
+      background: red;
+      color: white;
+    }
+
+    .assigned.orange {
+      background: orange;
+      color: white;
+    }
+
+    .employee-list {
+      background: #333;
+      color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      min-width: 250px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .employee-list-header {
+      flex: 0 0 auto;
+      margin-bottom: 10px;
+    }
+
+    #employees {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      margin-top: 10px;
+      background: #222;
+      border-radius: 5px;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="scheduler">
+  <!-- Projects -->
+  <div class="projects-wrapper">
+    <!-- Dynamically generated projects -->
+  </div>
+
+  <!-- Unallocated Staff -->
+  <div class="employee-list">
+    <div class="employee-list-header">
+      <div class="project-header">Available Employees</div>
+    </div>
+    <div id="employees" class="dropzone"></div>
+  </div>
+</div>
+
+<script>
+  let employees = [
+    { name: "SAM ALDERUCCIO", role: "PUMP CREW" },
+    { name: "TONY CURRO", role: "FOREMAN" },
+    { name: "CARMELO AUGELLI", role: "CONCRETE FOREMAN" },
+    { name: "FRANK AXIAK", role: "PUMP OPERATOR" },
+    { name: "DANIEL BELL", role: "CONCRETER" },
+    { name: "ANDREW BLACK", role: "LABOURER" }
+  ];
+
+  let selectedEmployees = [];
+
+  const projects = [
+    { name: "SPRING ST", supervisor: "ANTONIO GONCALVES" },
+    { name: "SKY SQUARE", supervisor: "ANTE KUSTURA" },
+    { name: "PUMP YARD", supervisor: "FILIP VALENTIC" },
+    { name: "GCEC GEELONG", supervisor: "CALLUM JONES" },
+    { name: "BENNETTS LANE", supervisor: "PETER TASIAS" },
+    { name: "ALBERT FIELDS", supervisor: "TONY CALAPA" },
+    { name: "MQR2", supervisor: "JOSIP RAJHER" },
+    { name: "FRANKSTON HOSPITAL", supervisor: "RYAN MCCANN" },
+    { name: "YARD 2", supervisor: "NICHOLAUS BECK" },
+    { name: "WESTFIELD", supervisor: "SARAH JOHNSON" }
+  ];
+
+  function renderEmployees() {
+    const container = document.getElementById("employees");
+    container.innerHTML = "";
+
+    employees.forEach((emp) => {
+      const div = document.createElement("div");
+      div.className = `employee ${getRoleClass(emp.role)}`;
+      div.draggable = true;
+      div.innerHTML = `<span class="name">${emp.name}</span><span class="role">${emp.role}</span>`;
+
+      div.addEventListener("click", (e) => {
+        if (selectedEmployees.includes(emp)) {
+          selectedEmployees = selectedEmployees.filter((e) => e !== emp);
+          div.classList.remove("selected");
+        } else {
+          selectedEmployees.push(emp);
+          div.classList.add("selected");
+        }
+        e.stopPropagation();
+      });
+
+      div.addEventListener("dragstart", (e) => {
+        const dragData = selectedEmployees.length > 0 ? selectedEmployees : [emp];
+        e.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+      });
+
+      container.appendChild(div);
+    });
+  }
+
+  function renderProjects() {
+    const projectWrapper = document.querySelector(".projects-wrapper");
+    projectWrapper.innerHTML = "";
+
+    projects.forEach((project, index) => {
+      const div = document.createElement("div");
+      div.className = "project";
+
+      div.innerHTML = `
+        <div class="project-header">
+          <div>${project.name}</div>
+          <div style="font-size:11px;">Supervisor: ${project.supervisor}</div>
+        </div>
+        <div class="dropzone" id="dropzone-${index}"></div>
+        <div class="pump-crew" id="pump-crew-${index}">
+          <span class="pump-crew-title">Pump Crew</span>
+        </div>
+      `;
+
+      const dropzone = div.querySelector(".dropzone");
+      const pumpCrewZone = div.querySelector(".pump-crew");
+
+      // Allow drag-and-drop for main project assignments
+      dropzone.addEventListener("dragover", (e) => e.preventDefault());
+      dropzone.addEventListener("drop", (e) => handleDrop(e, dropzone));
+
+      // Allow drag-and-drop for pump crew assignments
+      pumpCrewZone.addEventListener("dragover", (e) => e.preventDefault());
+      pumpCrewZone.addEventListener("drop", (e) => handleDrop(e, pumpCrewZone));
+
+      projectWrapper.appendChild(div);
+    });
+  }
+
+  function handleDrop(e, container) {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text/plain");
+    const droppedEmployees = JSON.parse(data);
+
+    droppedEmployees.forEach((emp) => {
+      const empDiv = document.createElement("div");
+      empDiv.className = `assigned ${getRoleClass(emp.role)}`;
+      empDiv.innerHTML = `<span class="name">${emp.name}</span><span class="role">${emp.role}</span>`;
+      container.appendChild(empDiv);
+
+      // Remove employee from the global employees list if it's in the available pool
+      employees = employees.filter((e) => e.name !== emp.name);
+
+      // Remove employee from other dropzones (if necessary)
+      const allAssigned = document.querySelectorAll(".assigned");
+      allAssigned.forEach((assigned) => {
+        if (assigned.textContent.includes(emp.name)) {
+          assigned.remove();
+        }
+      });
+    });
+
+    selectedEmployees = [];
+    renderEmployees();
+  }
+
+  function getRoleClass(role) {
+    if (role.toLowerCase().includes("foreman")) return "red";
+    if (role.toLowerCase().includes("pump")) return "blue";
+    if (role.toLowerCase().includes("concrete")) return "green";
+    if (role.toLowerCase().includes("labourer")) return "orange";
+    return "";
+  }
+
+  renderEmployees();
+  renderProjects();
+</script>
+
+</body>
+</html>
