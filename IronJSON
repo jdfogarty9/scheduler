@@ -1,0 +1,146 @@
+{
+"cards": {
+"settled": "$12.4M",
+"numDeals": "15"
+  },
+"filters": {
+"dateStart": "1/09/2025",
+"dateEnd": "30/9/2025"
+  },
+"staffList": [
+"Andrew Egan",
+"David Dixon",
+"Karen Budge",
+"Marc St Ange",
+"Ross Kooij",
+"",
+"",
+"",
+"",
+""
+],
+"selectedStaff": "Andrew Egan",
+"accountManagers": [
+"Andrew Egan",
+"David Dixon",
+"Karen Budge",
+"Marc St Ange",
+"Ross Kooij",
+"",
+"",
+"",
+"",
+""
+ ],
+"charts": {
+"pie": {
+"labels": [
+"Dealer Sale / Vendor in Possession",
+"Dealer Sale / Customer in Possession",
+"Private Sale / Vendor in Possession",
+"Private Sale / Customer in Possession",
+"End of Term Rollover",
+"Sale & Leaseback",
+"Redeploy of ICG Asset"
+],
+"data": [1.54,.43,0,0,.39,1.45,8.62,0],
+"colors": ["#2176d2","#43b883","#2eb872	","#00b894","#00fa9a","#3ad29f","#ff9900","#8c43b8"]
+ },
+"bar": {
+"labels": [
+"Andrew Egan",
+"David Dixon",
+"Karen Budge",
+"Marc St Ange",
+"Ross Kooij",
+"",
+"",
+"",
+"",
+""
+ ],
+"data1": [9908720,247500,1447700,392250,425000,,,,,],
+"data2": [7,1,1,51,,,,,] 
+}
+ },
+"tables": {
+"saleType": {
+"columns": ["Sale Type","Quotes","Purchase Price"],
+"rows": [
+{"Sale Type":"Dealer Sale / Vendor in Possession","Quotes":5,"Purchase Price":"$1,536,820.00"},
+{"Sale Type":"Dealer Sale / Customer in Possession","Quotes":1,"Purchase Price":"$425,000.00"},
+{"Sale Type":"Private Sale / Vendor in Possession","Quotes":0,"Purchase Price":"$0.00"},
+{"Sale Type":"Private Sale / Customer in Possession","Quotes":0,"Purchase Price":"$0.00"},
+{"Sale Type":"End of Term Rollover","Quotes":5,"Purchase Price":"$392,250.00"},
+{"Sale Type":"Sale & Leaseback","Quotes":1,"Purchase Price":"$1,447,700.00"},
+{"Sale Type":"Restructure of Current Assets","Quotes":3,"Purchase Price":"$8,619,400.00"},
+{"Sale Type":"Redeploy of ICG Asset","Quotes":0, "Purchase Price":"$0.00"}
+],
+"totals": {"Sale Type":"Total","Quotes":15, "Purchase Price":"$12,421,170.00"}
+},
+"quotes"   : {
+"columns": ["Quote ID", "Customer Name", "Pushed to Netsuite", "Purchase Price", "Monthly Pmt", "Contract Name"],
+"rows": [
+{"Quote ID": "Q18316","Customer Name": "APX Equipment Pty Ltd", "Pushed to Netsuite": "22/09/25", "Purchase Price": "$145,000.00", "Monthly Pmt": "$8,495.00", "Contract Name": "APX-1"},
+{"Quote ID": "Q18345","Customer Name": "Odell Resources Pty Ltd", "Pushed to Netsuite": "24/09/25", "Purchase Price": "$1,447,700.00", "Monthly Pmt": "$59,000.00", "Contract Name": "ODEL-91R-135R"},
+{"Quote ID": "Q18371","Customer Name": "MJ & JM McLellan Pty Ltd IIOC & ATF The Malcolm McLellan Family Trust", "Pushed to Netsuite": "01/10/25", "Purchase Price": "$96,250.00", "Monthly Pmt": "$5,525.00", "Contract Name": "MJM-56"},
+{"Quote ID": "Q18413","Customer Name": "Rusty Civil & Earthworks Pty Limited", "Pushed to Netsuite": "17/09/25", "Purchase Price": "$425,000.00", "Monthly Pmt": "$21,250.00", "Contract Name": "RCE-3"},
+{"Quote ID": "Q18414","Customer Name": "Hitz Drainage Contractors QLD Pty Ltd", "Pushed to Netsuite": "09/09/25", "Purchase Price": "$247,500.00", "Monthly Pmt": "$10,290.00", "Contract Name": "HDC-1A"},
+{"Quote ID": "Q18438","Customer Name": "Tulli Resources Pty Ltd", "Pushed to Netsuite": "10/09/25", "Purchase Price": "$226,000.00", "Monthly Pmt": "$11,300.00", "Contract Name": "TRS-9A-10A"},
+{"Quote ID": "Q18439","Customer Name": "Tulli Resources Pty Ltd", "Pushed to Netsuite": "10/09/25", "Purchase Price": "$219,000.00", "Monthly Pmt": "$10,950.00", "Contract Name": "TRS-9A-10A"},
+{"Quote ID": "Q18440","Customer Name": "Tas Construction Pty Ltd", "Pushed to Netsuite": "26/09/25", "Purchase Price": "$38,000.00", "Monthly Pmt": "$1,640.00", "Contract Name": "TAS-6-8"},
+{"Quote ID": "Q18441","Customer Name": "Tas Construction Pty Ltd", "Pushed to Netsuite": "26/09/25", "Purchase Price": "$38,000.00", "Monthly Pmt": "$1,640.00", "Contract Name": "TAS-6-8"},
+{"Quote ID": "Q18442","Customer Name": "Tas Construction Pty Ltd", "Pushed to Netsuite": "26/09/25", "Purchase Price": "$75,000.00", "Monthly Pmt": "$3,160.00", "Contract Name": "TAS-6-8"},
+{"Quote ID": "Q18455","Customer Name": "Meck Civil Pty Ltd", "Pushed to Netsuite": "23/09/25", "Purchase Price": "$193,500.00", "Monthly Pmt": "$10,490.00", "Contract Name": "MEC-5"},
+{"Quote ID": "Q18465","Customer Name": "PRG Equipment Pty Ltd", "Pushed to Netsuite": "23/09/25", "Purchase Price": "$7,047,900.00", "Monthly Pmt": "$343,845.00", "Contract Name": "PRGE-17-40"},
+{"Quote ID": "Q18467","Customer Name": "Odell Resources Pty Ltd", "Pushed to Netsuite": "24/09/25", "Purchase Price": "$1,378,000.00", "Monthly Pmt": "$65,800.00", "Contract Name": "ODEL-161-185"},
+{"Quote ID": "Q18469","Customer Name": "Fieldy's Resources Mining", "Pushed to Netsuite": "01/10/25", "Purchase Price": "$590,320.00", "Monthly Pmt": "$23,745.00", "Contract Name": "FRM-1"},
+{"Quote ID": "Q18479","Customer Name": "Transport & Waste Services Pty Ltd", "Pushed to Netsuite": "01/10/25", "Purchase Price": "$254,000.00", "Monthly Pmt": "$14,160.00", "Contract Name": "TWS-1"}
+ ],
+"totals": {"Quote ID": "","Customer Name": "Total", "Pushed to Netsuite": "", "Purchase Price": "$12,421,170.00", "Monthly Pmt": "$591,290.00", "Contract Name": ""}
+ },
+"accountManager": {
+"columns": ["Account Manager","Sale Type Target","Sum of Purchase Price"],
+"rows": [
+{"Account Manager":"Andrew Egan","Sale Type Target":"New Volume","Sum of Purchase Price":"$9,908,720.00"},
+{"Account Manager":"David Dixon","Sale Type Target":"New Volume","Sum of Purchase Price":"$247,500.00"},
+{"Account Manager":"Karen Budge","Sale Type Target":"New Volume","Sum of Purchase Price":"$.00"},
+{"Account Manager":"Marc St Ange","Sale Type Target":"New Volume","Sum of Purchase Price":"$392,250.00"},
+{"Account Manager":"Ross Kooij","Sale Type Target":"New Volume","Sum of Purchase Price":"$425,000.00"},
+
+
+
+
+
+
+
+
+{"Account Manager":"Karen Budge","Sale Type Target":"Rolled Volume","Sum of Purchase Price":"$1,447,700.00"},
+
+
+
+
+
+
+
+
+ ],
+"totals": {"Account Manager":"Total","Sale Type Target":"","Sum of Purchase Price":"$12,421,170.00"}
+ }
+},
+    "managerTotals": {
+      "columns": ["Manager", "New Volume", "SLB", "Roll", "Recontract", "Total"],
+      "rows": [
+        {"Manager":"Andrew Egan","New Volume":"$9,318,400.00","SLB":"","Roll":"","Recontract":"","Total":"$9,318,400.00"},
+        {"Manager":"David Dixon","New Volume":"$247,500.00","SLB":"","Roll":"","Recontract":"","Total":"$247,500.00"},
+        {"Manager":"Marc St Ange","New Volume":"$392,250.00","SLB":"","Roll":"","Recontract":"","Total":"$392,250.00"},
+        {"Manager":"Nick O'Doherty","New Volume":"","SLB":"","Roll":"","Recontract":"","Total":""},
+        {"Manager":"Paul Ireland","New Volume":"","SLB":"","Roll":"","Recontract":"","Total":""},
+        {"Manager":"Richard Lewis","New Volume":"","SLB":"","Roll":"","Recontract":"","Total":""},
+        {"Manager":"Ross Kooij","New Volume":"$425,000.00","SLB":"","Roll":"","Recontract":"","Total":"$425,000.00"},
+        {"Manager":"Karen Budge","New Volume":"$0.00","SLB":"","Roll":"$1,447,700.00","Recontract":"","Total":"$1,447,700.00"}
+      ]
+ 
+
+}
+}
