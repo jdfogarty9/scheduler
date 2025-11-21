@@ -144,11 +144,52 @@ body {
 .tables-right {
   display: flex; flex-direction: column; gap: 20px; height: 100%;
 }
+/* smaller stacked containers on the right */
 .table-container-sm {
   background: #fff; border-radius: 8px; padding: 10px;
   box-shadow: 0 2px 8px #e0e0e0; overflow-x: auto;
   min-height: 120px; display: flex; flex-direction: column; justify-content: flex-start;
 }
+
+/* new table container targeted for the bottom-right area (larger) */
+.table-container-sm.new-bottom {
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: auto;
+}
+
+/* Make the new table match the existing table style (thinner borders, light header bg) */
+#newTableTable {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed; /* use fixed so columns respect width hints */
+  font-size: 0.82rem;   /* match other tables */
+}
+#newTableTable th, #newTableTable td {
+  border: 1px solid #eee;  /* match existing tables */
+  padding: 5px 7px;
+  text-align: left;
+  vertical-align: middle;
+  height: 30px;
+}
+#newTableTable th {
+  background: #f2f2f2;
+  font-weight: 600;
+}
+
+/* Column width hints: user requested manager column reduced by half, other columns doubled.
+   These widths follow the requested ratios (may cause horizontal scroll if total >100%),
+   container has overflow enabled so it will behave like the existing tables when needed. */
+#newTableTable th.col-manager { width: 20%; }    /* halved from previous 40% */
+#newTableTable th.col-newvol,
+#newTableTable th.col-slb,
+#newTableTable th.col-roll,
+#newTableTable th.col-recontract,
+#newTableTable th.col-total { width: 24%; }     /* doubled from previous 12% */
+
+/* small table base styles (kept for other tables) */
 table { border-collapse: collapse; width: 100%; font-size: 0.82rem;}
 th, td { border: 1px solid #eee; padding: 5px 7px; }
 th { background: #f2f2f2; }
@@ -203,7 +244,7 @@ th { background: #f2f2f2; }
   <div class="separator-row">
     <div class="separator-line"></div>
   </div>
-  <!-- Tables: left stretches, right stacks two tables vertically -->
+  <!-- Tables: left stretches, right stacks two tables vertically, plus a new large table at bottom-right -->
   <div class="tables-row">
     <div class="tables-left">
       <div class="table-container"><div id="table2"></div></div>
@@ -211,6 +252,35 @@ th { background: #f2f2f2; }
     <div class="tables-right">
       <div class="table-container-sm"><div id="table1"></div></div>
       <div class="table-container-sm"><div id="table3"></div></div>
+
+      <!-- New table placed bottom-right (matches "New Table Structure"), now styled like the existing tables -->
+      <div class="table-container-sm new-bottom">
+        <div id="newTable">
+          <table id="newTableTable" aria-label="New Totals by Manager">
+            <thead>
+              <tr>
+                <th class="col-manager">&nbsp;</th>
+                <th class="col-newvol">New Volume</th>
+                <th class="col-slb">SLB</th>
+                <th class="col-roll">Roll</th>
+                <th class="col-recontract">Recontract</th>
+                <th class="col-total">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Andrew Egan</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>David Dixon</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>Marc St Ange</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>Nick O'Doherty</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>Paul Ireland</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>Richard Lewis</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>Ross Kooij</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>Karen Budge</td><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -269,6 +339,28 @@ th { background: #f2f2f2; }
       renderTable('table1', data.tables.saleType.columns, data.tables.saleType.rows, data.tables.saleType.totals);
       renderTable('table2', data.tables.quotes.columns, data.tables.quotes.rows, data.tables.quotes.totals);
       renderTable('table3', data.tables.accountManager.columns, data.tables.accountManager.rows, data.tables.accountManager.totals);
+
+      // Optional: If data contains a managerTotals structure for the new table, populate it
+      if (data.tables && data.tables.managerTotals && Array.isArray(data.tables.managerTotals.rows)) {
+        const tbody = document.querySelector('#newTableTable tbody');
+        if (tbody) {
+          tbody.innerHTML = '';
+          const managers = data.tables.managerTotals.rows;
+          managers.forEach(r => {
+            const tr = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            nameCell.textContent = r.Manager || '';
+            tr.appendChild(nameCell);
+
+            ['New Volume','SLB','Roll','Recontract','Total'].forEach(col => {
+              const td = document.createElement('td');
+              td.textContent = (r[col] !== undefined && r[col] !== null) ? r[col] : '';
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+        }
+      }
     }
 
 window.addEventListener('DOMContentLoaded', function() {
@@ -343,6 +435,16 @@ window.addEventListener('DOMContentLoaded', function() {
         window.barChartRef.data.datasets[0].data = data.charts.bar.data1;
         window.barChartRef.data.datasets[1].data = data.charts.bar.data2;
         window.barChartRef.update();
+      }
+
+      // If incoming JSON contains managerTotals, populate the new table
+      try {
+        var parsed = JSON.parse(jsonString);
+        if (parsed.tables && parsed.tables.managerTotals) {
+          renderDashboard(parsed); // renderDashboard handles the managerTotals if present
+        }
+      } catch (e) {
+        // ignore
       }
     }
 
