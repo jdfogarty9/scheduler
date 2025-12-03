@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Dashboard</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      background: #fafafa;
+      color: #222;
+    }
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      padding: 36px 36px 20px 36px;
+      max-width: 1400px;
+      margin: auto;
+    }
+    .summary-section {
+      margin-bottom: 28px;
+    }
+    .section-title {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #2176d2;
+      border-bottom: 2px solid #2176d2;
+      padding-bottom: 2px;
+      letter-spacing: 1px;
+    }
+    .section-title.orange {
+      color: #ff9900;
+      border-color: #ff9900;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 8px;
+      background: #fff;
+      box-shadow: 0 2px 8px #e0e0e088;
+      font-size: 1rem;
+    }
+    th, td {
+      padding: 7px 8px;
+      border: 1px solid #eee;
+      text-align: right;
+    }
+    th {
+      background: #f4f8fb;
+      font-weight: 500;
+      color: #2176d2;
+      text-align: left;
+    }
+    td:first-child, th:first-child {
+      text-align: left;
+    }
+    .totals-row {
+      font-weight: bold;
+      background: #e9f4fd;
+      color: #2176d2;
+    }
+    .summary-section .totals-row {
+      background: #e2e2e2;
+      color: #222;
+    }
+    .gauge-section {
+      display: flex;
+      flex-direction: row;
+      gap: 48px;
+      margin-top: 32px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .gauge {
+      width: 320px;
+      height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .gauge-label {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 18px;
+      color: #444;
+    }
+    .gauge-value {
+      position: absolute;
+      left: 0; right: 0; top: 75px;
+      font-size: 2.6rem;
+      font-weight: 500;
+      text-align: center;
+      color: #222;
+    }
+    .gauge-svg-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .gauge-svg {
+      width: 100%;
+      height: 100%;
+    }
+    @media (max-width: 1100px) {
+      .dashboard-container {
+        grid-template-columns: 1fr;
+      }
+      .gauge-section {
+        flex-direction: column;
+        gap: 28px;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Left side: Summary Tables -->
+    <div>
+      <div class="summary-section">
+        <div class="section-title">New Volume</div>
+        <table>
+          <thead>
+            <tr>
+              <th>AccountManager</th>
+              <th>Target</th>
+              <th>Target YTD</th>
+              <th>Actual$</th>
+              <th>% to target</th>
+            </tr>
+          </thead>
+          <tbody>
+<tr><td>David Dixon</td><td>New</td><td>$5,732,484</td><td>$3,165,500</td><td>55%</td></tr>             <tr><td>Ross Kooij</td><td>New</td><td>$5,732,484</td><td>$1,752,053</td><td>31%</td></tr>             <tr><td>Marc St Ange</td><td>New</td><td>$5,732,484</td><td>$3,470,210</td><td>61%</td></tr>             <tr><td>Andrew Egan</td><td>New</td><td>$13,000,000</td><td>$8,762,854</td><td>67%</td></tr>             <tr><td>Karen Budge</td><td>New</td><td>$0</td><td>$0</td><td>0%</td></tr>             <tr><td>Head Office</td><td>New</td><td>$5,415,584</td><td>$2,335,302</td><td>43%</td></tr>             <tr><td>           </tbody>           <tfoot>             <tr class="totals-row">               <td>Total</td>               <td></td>               <td>$35,613,037</td>               <td>$19,485,919</td>               <td>55%</td>             </tr>           </tfoot>         </table>       </div>       <div class="summary-section">         <div class="section-title">Rolled Volume</div>         <table>           <thead>             <tr>               <th>AccountManager</th>               <th>Target</th>               <th>Target YTD</th>               <th>Actual$</th>               <th>% to target</th>             </tr>           </thead>           <tbody>
+            <tr><td>David Dixon</td><td>Rolled</td><td>$0</td><td>$0</td><td>0%</td></tr>             <tr><td>Ross Kooij</td><td>Rolled</td><td>$0</td><td>$0</td><td>0%</td></tr>             <tr><td>Marc St Ange</td><td>Rolled</td><td>$0</td><td>$0</td><td>0%</td></tr>             <tr><td>Andrew Egan</td><td>Rolled</td><td>$0</td><td>$0</td><td>0%</td></tr>             <tr><td>Karen Budge</td><td>Rolled</td><td>$7,410,000</td><td>$2,398,905</td><td>32%</td></tr>             <tr><td>Head Office</td><td>Rolled</td><td>$0</td><td>$0</td><td>0%</td></tr>             <tr><td>           </tbody>           <tfoot>             <tr class="totals-row">               <td>Total</td>               <td></td>               <td>$7,410,000</td>               <td>$2,398,905</td>               <td>32%</td>             </tr>           </tfoot>         </table>       </div>       <div class="summary-section">         <div class="section-title">Total Volume</div>         <table>           <thead>             <tr>               <th>AccountManager</th>               <th>Target YTD</th>               <th>ActualSalesTotal</th>               <th>% to Target</th>             </tr>           </thead>           <tbody>
+            <tr><td>David Dixon</td><td>$5,732,484</td><td>$3,165,500</td><td>55%</td></tr>             <tr><td>Ross Kooij</td><td>$5,732,484</td><td>$1,752,053</td><td>31%</td></tr>             <tr><td>Marc St Ange</td><td>$5,732,484</td><td>$3,470,210</td><td>61%</td></tr>             <tr><td>Andrew Egan</td><td>$13,000,000</td><td>$8,762,854</td><td>67%</td></tr>             <tr><td>Karen Budge</td><td>$7,410,000</td><td>$2,398,905</td><td>0%</td></tr>  <tr><td>Head Office</td><td>$5,415,584</td><td>$2,335,302</td><td>43%</td></tr>            </tbody>           <tfoot>             <tr class="totals-row">               <td>Total</td>               <td>$43,023,037</td>               <td>$19,485,919</td>               <td>51%</td>             </tr>           </tfoot>         </table>       </div>     </div>     <!-- Right side: Target vs Actual Table and Gauges -->     <div>       <div class="summary-section">         <div class="section-title orange" style="text-align:center;">Target vs Actual</div>         <table>           <thead>             <tr>               <th>AccountManager</th>               <th>ActualSalesNew</th>               <th>TargetAmtNew</th>               <th>ActualSalesRolled</th>               <th>TargetAmtRolled</th>               <th>ActualSalesTotal</th>               <th>ActualTarget</th>             </tr>           </thead>           <tbody>
+            <tr>               <td>David Dixon</td>               <td>$3,165,500</td><td>$5,732,484</td>               <td>$0</td><td>$0</td>               <td>$3,165,500</td><td>$5,732,484</td>             </tr>             <tr>               <td>Ross Kooij</td>               <td>$1,752,053</td><td>$5,732,484</td>               <td>$0</td><td>$0</td>               <td>$1,752,053</td><td>$5,732,484</td>             </tr>             <tr>               <td>Marc St Ange</td>               <td>$3,470,210</td><td>$5,732,484</td>               <td>$0</td><td>$0</td>               <td>$3,470,210</td><td>$5,732,484</td>             </tr>             <tr>               <td>Andrew Egan</td>              <td>$8,762,854</td><td>$13,000,000</td>               <td>$0</td><td>$0</td>               <td>$8,762,854</td><td>$13,000,000</td>             </tr>             <tr>               <td>Karen Budge</td>              <td>$0</td><td>$0</td>               <td>$2,398,905</td><td>$7,410,000</td>               <td>$2,398,905</td><td>$7,410,000</td>             </tr>             <tr>               <td>Head Office</td>              <td>$2,335,302</td><td>$5,415,584</td>               <td>$0</td><td>$0</td>               <td>$2,335,302</td><td>$5,415,584</td>             </tr>                        </tbody>           <tfoot>             <tr class="totals-row">               <td>Total</td>               <td>$19,485,919</td>               <td>$35,613,037</td>               <td>$2,398,905</td>               <td>$7,410,000</td>               <td>$21,884,823</td>               <td>$43,023,037</td>             </tr>           </tfoot>         </table>       </div>
+  <div class="gauge-section">
+    <!-- Gauge 1: % to Target -->
+    <div class="gauge">
+      <div class="gauge-svg-container" style="height:120px;">
+        <svg id="gaugeSvgPercent" class="gauge-svg" width="240" height="120" viewBox="0 0 240 120">
+          <!-- Background track -->
+          <path
+            id="gaugeBgPercent"
+            d="M 40 100 A 80 80 0 0 1 200 100"
+            fill="none"
+            stroke="#ccc"
+            stroke-width="28"
+            stroke-linecap="round"
+          />
+          <!-- Foreground value -->
+          <path
+            id="gaugeValuePercent"
+            d="M 40 100 A 80 80 0 0 1 200 100"
+            fill="none"
+            stroke="#2176d2"
+            stroke-width="28"
+            stroke-linecap="round"
+            style="transition: stroke-dashoffset 0.7s cubic-bezier(.4,2,.6,1);"
+          />
+        </svg>
+        <div id="gaugeNumberPercent" class="gauge-value">26</div>
+      </div>
+      <div class="gauge-label">% to Target</div>
+    </div>
+    <!-- Gauge 2: $ to Target -->
+    <div class="gauge">
+      <div class="gauge-svg-container" style="height:120px;">
+        <svg id="gaugeSvgDollar" class="gauge-svg" width="240" height="120" viewBox="0 0 240 120">
+          <!-- Background track -->
+          <path
+            id="gaugeBgDollar"
+            d="M 40 100 A 80 80 0 0 1 200 100"
+            fill="none"
+            stroke="#ccc"
+            stroke-width="28"
+            stroke-linecap="round"
+          />
+          <!-- Foreground value -->
+          <path
+            id="gaugeValueDollar"
+            d="M 40 100 A 80 80 0 0 1 200 100"
+            fill="none"
+            stroke="#43b883"
+            stroke-width="28"
+            stroke-linecap="round"
+            style="transition: stroke-dashoffset 0.7s cubic-bezier(.4,2,.6,1);"
+          />
+        </svg>
+        <div id="gaugeNumberDollar" class="gauge-value">$4.7M</div>
+      </div>
+      <div class="gauge-label">$ to Target</div>
+      <div class="gauge-minmax">
+        <span></span>
+        <span>$43M</span>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Arc length for the semi-circle path above (for 80px radius and 180° arc)
+    const r = 80;
+    const arcLength = Math.PI * r; // ≈ 251.3
+
+    function setGaugePercent(percent) {
+      percent = Math.max(0, Math.min(100, percent));
+      const filled = (percent / 100) * arcLength;
+      const unfilled = arcLength - filled;
+
+      const gaugeValue = document.getElementById('gaugeValuePercent');
+      gaugeValue.setAttribute('stroke-dasharray', arcLength);
+      gaugeValue.setAttribute('stroke-dashoffset', unfilled);
+
+      document.getElementById('gaugeNumberPercent').textContent = percent;
+    }
+
+    function setGaugeDollar(current, target) {
+      let percent = target > 0 ? (current / target) * 100 : 0;
+      percent = Math.max(0, Math.min(100, percent));
+      const filled = (percent / 100) * arcLength;
+      const unfilled = arcLength - filled;
+
+      const gaugeValue = document.getElementById('gaugeValueDollar');
+      gaugeValue.setAttribute('stroke-dasharray', arcLength);
+      gaugeValue.setAttribute('stroke-dashoffset', unfilled);
+
+      document.getElementById('gaugeNumberDollar').textContent = `$${current.toFixed(1)}M`;
+    }
+
+    // Initial state: 51% and $21.9M/$137.9M
+    setGaugePercent(51);
+    setGaugeDollar(21.9, 43);
+
+    // Example: To change to 75% and $103.4M/$137.9M, call:
+    // setGaugePercent(75);
+    // setGaugeDollar(103.4, 137.9);
+  </script>
+</body>
+</html>
