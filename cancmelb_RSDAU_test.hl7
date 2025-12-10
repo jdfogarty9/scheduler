@@ -1,0 +1,8 @@
+MSH|^~\&|HealthLink Client Test Message Generator v6.8.1.5|cancmelb|Unknown|cancmelb|20070924172032+1000|PKI|REF^I12|TSTMSG20251202151434|P|2.3.1^AUS
+RF1|P|R|MED^Medical^HL70281|||195|||20070924172024+1000
+PRD|PP|Healthlink^Test^^^Mr^^L|P O Box 964^^Sydney^NSW^2000^^C||^WPN^PH^^^04^17728660~^WPN^FX^^^07^47952629||080594CY^PROV#
+PRD|RP|Healthlink^Test^^^Mr^^L|P O Box 4^^Aitkenvale^Qld^4814^^C||^WPN^PH^^^04^17728660~^WPN^FX^^^07^47952629||080594CY^PROV#
+PRD|RT|Practitioner^General^^^Dr^^L|^^^^^^C||||0000000Y^PROV#
+PID|||48^^^practiX^PI^MSS00000||HealthlinkTest^Patient^^^Mr^^L||19121212+1000|M||9^Not stated^NHDDV10-000001|6 Test Street^^Townsville^Qld^4810^^C||^PRN^PH^^^07^47951236|||U^Unknown^HL70002
+OBR|1|||^Report
+OBX|1|FT|TXT^^AUSPDI||\.nf\\.br\This test report is being sent to your clinical system from HealthLink to test your installation and configuration to import clinical documents.\.br\ \.br\If your practice system is configured correctly it will automatically generate an acknowledgement indicating the successful delivery of this report.\.br\ \.br\This test report can be safely deleted.\.br\ \.br\If any further action is required you will be contacted by Healthlink\.br\ \.br||||||F|||20070924172032+1000
