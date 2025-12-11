@@ -1,10 +1,9 @@
-MSH|^~\&|PITConverter|cancmelb|Genie v11.11|cancmelb|20250311130313|PKI|REF^I12|MSG20250311130313-6A|P|2.3.1^AUS
-RF1|P^Pending^HL70283|R^Routine^HL70280|MED^Medical^Hl70281|FI^For your information. No action requested.^HL70282||Dr Allan Zimet|20250311130313|||E^Event Summary^HL70336
+MSH|^~\&|PITConverter|cancmelb|Genie v11.11|cancmelb|20252911132901|PKI|REF^I12|MSG20252911132901-AC|P|2.3.1^AUS
+RF1|P^Pending^HL70283|R^Routine^HL70280|MED^Medical^Hl70281|FI^For your information. No action requested.^HL70282||Dr Allan Zimet|20252911132901|||E^Event Summary^HL70336
 PRD|PP^Primary provider^HL70286|CHOONG^Karen^^^Dr|125 Power Street^^HAWTHORN^VIC^3122^^O||03 9818 3377^WPN^PH^^61^03^98183377~03 9818 5477^WPN^FX^^61^03^98185477||226983LF^PROV#
 PRD|RP|See^Andrew^^^Dr|Suite 8.2, Level 8^124 Grey Street^EAST MELBOURNE^VIC^3002^^O||03 9132 6200^WPN^PH^^61^03^91326200~03 9132 6201^WPN^FX^^61^03^91326201||4432529B^PROV#~8003613339767469^NPI^AUSHIC
 PRD|RT|JENNENS^Ross^^^Dr|43 Erin Street^^RICHMOND^VIC^3121^^O||03 9069 8282^WPN^PH^^61^03^90698282~03 9427 0847^WPN^FX^^61^03^94270847||218909CK^PROV#
 PID|1||30861418524^^^AUSHIC^MC~35399^^^Local||SMITH^Susan^^^Ms||19511204000000+1000|F||9^^NHDDV10-000001|2/8 Lisson Grove^^HAWTHORN^VIC^3122^^O||0418 854 602^^CP^^^^0418854602~^NET^Internet^smsmith010@gmail.com||||||30861418524
 OBR|1||68141^Dr Andrew See^GEN14303^L| LETTER^ LETTER^L|||20251201181303+1000|||||||||||||||||PHY|||^^^20251201181303+1000
-OBX|1|FT|LETTER^ LETTER^L|1|DIAGNOSIS:\.br\\.br\Adenocarcinoma of the lung left lower lobe May 2018 T2N3M0; KRAS mutation, EGFR and ALK wild-type.\.br\\.br\MANAGEMENT:\.br\\.br\Nivolumab from October 2018 - October 2022, March 2023).\.br\Thyroxine 150 mcg/day weekdays and 200 mcg on weekends.\.br\\.br\Thank you for your ongoing care of Fred, who I reviewed today for ongoing management of his left lower lobe lung cancer and bladder cancer.\.br\\.br\Fred reports intermittent back pain, which he manages with floor exercises.  He has had no bladder episodes for a long time.  He is tolerating his chemo-immunotherapy well, with no issues reported.  His weight is stable and urinary function is good.  He is maintaining a good performance status, and performing his usual activities.\.br\\.br\Examination:\.br\Unremarkable.\.br\\.br\I will continue to monitor Fred’s progress.\.br\\.br\Please do not hesitate to call me with any concerns on 0418 543 700.\.br\\.br\\.br\|||||F 
+OBX|1|FT|LETTER^ LETTER^L|1|I will continue to monitor Fred’s progress.\.br\\.br\\.br\|||||F
 PV1|1|N||||||5823331A^CHAKRABARTI^Anannya^^^Miss^^^AUSHICPR^L^^^UPIN|218909CK^JENNENS^Ross^^^Dr^^^AUSHICPR^L^^^UPIN|
-
