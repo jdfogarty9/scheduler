@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PRACTICAL COMPLETION MILESTONE</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <style>
+    body { margin:0; padding:0; }
+    #chartContainer { width:100vw; height:80vh; }
+  </style>
+</head>
+<body>
+<div id="chartContainer">
+  <canvas id="pcChart"></canvas>
+</div>
+<script>
+const labels = [
+<<BaseMonths>>
+];
+
+// Blue bar: Target PC Variance
+const targetPCVariance = [0, 0, 2, 0, 0, 0, -34, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5];
+// Orange bar: Contract PC Variance
+const contractPCVariance = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+// Orange line: Contract Status incl Approved EOT - Practical Completion
+const contractStatus = [
+ <<ContractStatus_PC>>
+];
+
+// Blue line: Target Status/Actual - Practical Completion
+const targetStatus = [
+<<TargetStatus_PC>>
+];
+
+function parseDateArr(arr) {
+  return arr.map((d, i) => d ? {x: labels[i], y: d} : {x: labels[i], y: null});
+}
+function parseNumArr(arr) {
+  return arr.map((v, i) => ({x: labels[i], y: v}));
+}
+
+const ctx = document.getElementById('pcChart').getContext('2d');
+const pcChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [
+      // Blue bar: Target PC Variance
+      {
+        type: 'bar',
+        label: 'Target PC Variance',
+        data: parseNumArr(targetPCVariance),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        yAxisID: 'y1',
+        datalabels: {
+          color: 'royalblue',
+          font: {weight: 'bold'},
+          anchor: function(context) {
+            // Always anchor to "end" (bar base)
+            return 'end';
+          },
+          align: function(context) {
+            // For negative, align 'end' (so label is outside, below bar); for positive, align 'start' (top)
+            const v = context.dataset.data[context.dataIndex].y;
+            return v < 0 ? 'end' : 'start';
+          },
+          offset: 4,
+          clip: false,
+          clamp: false,
+          formatter: function(value, context) {
+            if (value.y !== 0) return value.y;
+            return '';
+          }
+        }
+      },
+      // Orange bar: Contract PC Variance (top for positive)
+      {
+        type: 'bar',
+        label: 'Contract PC Variance',
+        data: parseNumArr(contractPCVariance),
+        backgroundColor: 'rgba(255, 140, 28, 0.7)',
+        borderColor: 'rgba(255, 140, 28, 1)',
+        borderWidth: 1,
+        yAxisID: 'y1',
+        datalabels: {
+          color: 'orange',
+          font: {weight: 'bold'},
+          anchor: 'end',
+          align: 'start', // always at top of bar
+          offset: 4,
+          clip: false,
+          clamp: false,
+          formatter: function(value, context) {
+            if (value.y !== 0) return value.y;
+            return '';
+          }
+        }
+      },
+      // Orange line: Contract Status incl Approved EOT - Practical Completion
+      {
+        type: 'line',
+        label: 'Contract Status incl Approved EOT - Practical Completion',
+        data: parseDateArr(contractStatus),
+        borderColor: 'orange',
+        backgroundColor: 'orange',
+        fill: false,
+        tension: 0,
+        pointRadius: 6,
+        pointBorderColor: 'orange',
+        pointBackgroundColor: 'orange',
+        borderWidth: 4,
+        showLine: true,
+        yAxisID: 'y',
+        order: 3,
+        datalabels: {
+          align: 'top',
+          anchor: 'end',
+          color: 'orange',
+          font: { weight: 'bold' },
+          formatter: function(value, context) {
+            if (value.y) {
+              let dt = luxon.DateTime.fromISO(value.y);
+              if (dt.isValid) return dt.toFormat('d/LL');
+            }
+            return '';
+          }
+        }
+      },
+      // Blue line: Target Status/Actual - Practical Completion
+      {
+        type: 'line',
+        label: 'Target Status/Actual - Practical Completion',
+        data: parseDateArr(targetStatus),
+        borderColor: 'royalblue',
+        backgroundColor: 'royalblue',
+        fill: false,
+        tension: 0,
+        pointRadius: 5,
+        pointBorderColor: 'royalblue',
+        pointBackgroundColor: 'royalblue',
+        borderWidth: 3,
+        showLine: true,
+        yAxisID: 'y',
+        order: 4,
+        datalabels: {
+          align: 'top',
+          anchor: 'end',
+          color: 'royalblue',
+          font: { weight: 'bold' },
+          formatter: function(value, context) {
+            if (value.y) {
+              let dt = luxon.DateTime.fromISO(value.y);
+              if (dt.isValid) return dt.toFormat('d/LL');
+            }
+            return '';
+          }
+        }
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      title: {
+        display: true,
+        text: 'PRACTICAL COMPLETION MILESTONE'
+      },
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          boxWidth: 24
+        }
+      },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) label += ': ';
+            // For bar datasets, just show the value
+            if (context.dataset.type === 'bar') {
+              label += context.parsed.y;
+              return label;
+            }
+            // For line datasets, show full date
+            if (context.parsed.y) {
+              let dt;
+              if (typeof context.parsed.y === 'number') {
+                dt = luxon.DateTime.fromMillis(context.parsed.y);
+              } else if (context.parsed.y instanceof Date) {
+                dt = luxon.DateTime.fromJSDate(context.parsed.y);
+              } else if (typeof context.parsed.y === 'string') {
+                dt = luxon.DateTime.fromISO(context.parsed.y);
+              }
+              if (dt && dt.isValid) {
+                label += dt.toFormat('d/LL/yyyy');
+              } else {
+                label += context.parsed.y;
+              }
+            }
+            return label;
+          }
+        }
+      },
+      datalabels: {
+        display: true
+      }
+    },
+    responsive: true,
+    scales: {
+      x: {
+        type: 'time',
+        time: {
+          unit: 'month',
+          tooltipFormat: 'MMM-yyyy',
+          displayFormats: {
+            month: 'MMM yyyy'
+          }
+        },
+        title: {
+          display: false
+        }
+      },
+      y: {
+        type: 'time',
+        position: 'left',
+        time: {
+          unit: 'day',
+          tooltipFormat: 'd/LL/yyyy',
+          displayFormats: {
+            day: 'd/LL/yyyy'
+          }
+        },
+        title: {
+          display: false
+        },
+        min: <<Min>>,
+        max: <<Max>>,
+        reverse: false
+      },
+      y1: {
+        type: 'linear',
+        position: 'right',
+        title: {
+          display: false
+        },
+        grid: {
+          drawOnChartArea: false
+        },
+        min: <<MinNo>>,
+        max: <<MaxNo>>,
+        ticks: {
+          callback: function(value) {
+            return value;
+          }
+        }
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+</script>
+</body>
+</html>
