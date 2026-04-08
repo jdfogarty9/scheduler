@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Send Custom Message to Employees</title>
+  <style>
+    body { background: #f4f4f4; font-family: Arial, sans-serif; margin: 0; padding: 30px; }
+    h2 { margin-top: 0; }
+    .container {
+      display: flex;
+      flex-direction: row;
+      gap: 48px;
+      align-items: flex-start;
+      width: 100%;
+      box-sizing: border-box;
+      justify-content: flex-start;
+    }
+    .employee-list {
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 6px #0001;
+      padding: 18px;
+      min-width: 340px; width: 340px;
+      box-sizing: border-box;
+      display: flex; flex-direction: column;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .project-bucket {
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 6px #0001;
+      padding: 18px;
+      min-width: 320px; width: 320px;
+      box-sizing: border-box;
+      display: flex; flex-direction: column; min-height: 350px;
+      margin-left: 0; margin-right: 0;
+    }
+    .message-area {
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 6px #0001;
+      padding: 18px;
+      min-width: 640px; width: 640px; /* wider! */
+      box-sizing: border-box; display: flex; flex-direction: column;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .bucket-title { font-weight: bold; font-size: 18px; margin-bottom: 8px; }
+    .recipients-label { font-size: 13px; color: #888; margin-bottom: 8px; }
+    .search-bar {
+      margin-bottom: 10px; width: 100%;
+    }
+    .search-bar input {
+      width: 100%; padding: 6px 10px;
+      border-radius: 4px; border: 1px solid #bbb;
+      font-size: 14px; margin-bottom: 6px; box-sizing: border-box;
+    }
+    .employee {
+      background: #e3e3e3; border-radius: 6px; padding: 7px 9px; margin: 7px 0;
+      cursor: pointer; user-select: none; display: flex; align-items: center;
+      border: 2px solid transparent;
+      transition: border 0.1s;
+      font-size: 12px; /* smaller font for employee names */
+      font-family: 'Segoe UI', Arial, sans-serif;
+      letter-spacing: 0.01em;
+    }
+    .employee.selected {
+      border: 2px solid #1976d2;
+      background: #d1eaff;
+    }
+    .employee.dragged { opacity: 0.5; }
+    textarea {
+      width: 100%;
+      height: 112px; /* double previous 56px */
+      border-radius: 4px; border: 1px solid #bbb;
+      padding: 8px; font-size: 13px; margin-top: 8px;
+      box-sizing: border-box; resize: vertical; min-height: 72px; max-height: 300px;
+    }
+    .recipient-list { font-size: 12px; color: #222; margin-top: 12px; }
+    .send-btn {
+      margin-top: 18px; padding: 10px 24px;
+      background: #1976d2; color: #fff; border: none; border-radius: 5px;
+      font-size: 15px; cursor: pointer; transition: background 0.2s;
+    }
+    .send-btn:hover { background: #1251a2; }
+    @media (max-width: 1500px) {
+      .container { flex-direction: column; min-width: 0; gap: 20px;}
+      .employee-list, .project-bucket, .message-area { width: 100%; min-width: 0; max-width: unset; }
+      .project-bucket { margin: 0 0 20px 0; }
+      .message-area { margin-top: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Send Custom Message</h2>
+  <div class="container">
+    <div class="employee-list">
+      <div class="bucket-title">Available Employees</div>
+      <div class="search-bar">
+        <input type="text" id="employeeSearch" placeholder="Search employees..." oninput="render()" autocomplete="off">
+      </div>
+      <div id="employeePool"></div>
+    </div>
+    <div class="project-bucket" id="projectBucket" ondragover="event.preventDefault()">
+      <div class="bucket-title">Recipients</div>
+      <div class="recipients-label">Drag employees here</div>
+      <div id="bucketList"></div>
+    </div>
+    <div class="message-area">
+      <label for="customMessage"><b>Custom Message</b></label>
+      <textarea id="customMessage" placeholder="Write your message here..."></textarea>
+      <div class="recipient-list" id="recipientList"></div>
+      <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+<script>
+let employees = [];
+let available = [];
+let recipients = [];
+let selectedIndexes = [];
+
+// Function to load employees from JSON string (replace employees and reset state)
+async function loadDataSMS(employeesJsonSMS) {
+  try {
+    employees = JSON.parse(employeesJsonSMS);
+    available = [...employees];
+    recipients = [];
+    selectedIndexes = [];
+    render();
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
+}
+
+function render() {
+  const searchValue = (document.getElementById('employeeSearch')?.value || "").toLowerCase().trim();
+  const pool = document.getElementById('employeePool');
+  pool.innerHTML = '';
+
+  const filteredAvailable = [];
+  const availableMapIdx = [];
+  available.forEach((emp, i) => {
+    const searchTarget = (emp.name + " " + (emp.phone || "")).toLowerCase();
+    if (!searchValue || searchTarget.includes(searchValue)) {
+      filteredAvailable.push(emp);
+      availableMapIdx.push(i);
+    }
+  });
+
+  filteredAvailable.forEach((emp, idx) => {
+    const realIdx = availableMapIdx[idx];
+    const div = document.createElement('div');
+    div.className = 'employee';
+    if (selectedIndexes.includes(realIdx)) div.classList.add('selected');
+    div.textContent = emp.name + (emp.phone ? " (" + emp.phone + ")" : "");
+    div.setAttribute('draggable', true);
+
+    // Selection logic
+    div.onclick = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (selectedIndexes.includes(realIdx)) {
+          selectedIndexes = selectedIndexes.filter(idx2 => idx2 !== realIdx);
+        } else {
+          selectedIndexes.push(realIdx);
+        }
+      } else if (e.shiftKey) {
+        if (selectedIndexes.length > 0) {
+          let last = selectedIndexes[selectedIndexes.length - 1];
+          let [start, end] = [Math.min(last, realIdx), Math.max(last, realIdx)];
+          selectedIndexes = [];
+          for (let j = start; j <= end; j++) selectedIndexes.push(j);
+        } else {
+          selectedIndexes = [realIdx];
+        }
+      } else {
+        selectedIndexes = [realIdx];
+      }
+      render();
+      e.stopPropagation();
+    };
+
+    // Drag logic
+    div.ondragstart = (e) => {
+      if (!selectedIndexes.includes(realIdx)) selectedIndexes = [realIdx];
+      div.classList.add('dragged');
+      let names = selectedIndexes.map(idx3 => available[idx3].name);
+      e.dataTransfer.setData('application/json', JSON.stringify(names));
+    };
+    div.ondragend = () => div.classList.remove('dragged');
+    pool.appendChild(div);
+  });
+
+  // Deselect on background click
+  pool.parentElement.onclick = function(e) {
+    if (e.target === pool.parentElement) {
+      selectedIndexes = [];
+      render();
+    }
+  };
+
+  // Recipients in bucket
+  const bucket = document.getElementById('bucketList');
+  bucket.innerHTML = '';
+  recipients.forEach(emp => {
+    const div = document.createElement('div');
+    div.className = 'employee';
+    div.textContent = emp.name + (emp.phone ? " (" + emp.phone + ")" : "");
+    div.onclick = () => {
+      available.push(emp);
+      recipients = recipients.filter(e => e.name !== emp.name);
+      render();
+    };
+    bucket.appendChild(div);
+  });
+
+  document.getElementById('recipientList').innerHTML = recipients.length
+    ? `<b>Recipients:</b> ${recipients.map(e => e.name + (e.phone ? " (" + e.phone + ")" : "")).join(', ')}`
+    : `<span style="color:#888;">No recipients selected.</span>`;
+}
+
+// Dragging logic for dropping employee(s) in the bucket
+document.getElementById('projectBucket').ondrop = function(e) {
+  e.preventDefault();
+  let names;
+  try {
+    names = JSON.parse(e.dataTransfer.getData('application/json'));
+  } catch { names = []; }
+  if (!names || !Array.isArray(names)) return;
+
+  names.forEach(name => {
+    const idx = available.findIndex(e => e.name === name);
+    if (idx !== -1 && !recipients.some(e => e.name === name)) {
+      recipients.push(available[idx]);
+    }
+  });
+  available = available.filter(e => !names.includes(e.name));
+  selectedIndexes = [];
+  render();
+};
+
+function sendMessage() {
+  const message = document.getElementById('customMessage').value.trim();
+  if (recipients.length === 0) {
+    alert("Please select at least one recipient.");
+    return;
+  }
+  if (!message) {
+    alert("Please enter a message before sending.");
+    return;
+  }
+  const recipientData = recipients.map(e => ({ name: e.name, phone: e.phone }));
+  const scriptParam = JSON.stringify({
+    recipients: recipientData,
+    message
+  });
+  if (window.FileMaker && typeof window.FileMaker.PerformScript === 'function') {
+    window.FileMaker.PerformScript("SendSMS", scriptParam);
+  }
+}
+</script>
+</body>
+</html>
