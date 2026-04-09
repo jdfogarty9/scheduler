@@ -72,6 +72,16 @@
       box-sizing: border-box; resize: vertical; min-height: 72px; max-height: 300px;
     }
     .recipient-list { font-size: 12px; color: #222; margin-top: 12px; }
+
+    /* schedule inputs */
+    .message-area input[type="date"],
+    .message-area input[type="time"]{
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      font-size: 13px;
+    }
+
     .send-btn {
       margin-top: 18px; padding: 10px 24px;
       background: #1976d2; color: #fff; border: none; border-radius: 5px;
@@ -96,15 +106,39 @@
       </div>
       <div id="employeePool"></div>
     </div>
+
     <div class="project-bucket" id="projectBucket" ondragover="event.preventDefault()">
       <div class="bucket-title">Recipients</div>
       <div class="recipients-label">Drag employees here</div>
       <div id="bucketList"></div>
     </div>
+
     <div class="message-area">
       <label for="customMessage"><b>Custom Message</b></label>
       <textarea id="customMessage" placeholder="Write your message here..."></textarea>
+
       <div class="recipient-list" id="recipientList"></div>
+
+      <!-- Schedule controls -->
+      <div style="margin-top:12px; display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+          <input type="checkbox" id="scheduleEnabled" onchange="onScheduleToggle()">
+          Schedule send
+        </label>
+
+        <label style="font-size:13px;">
+          Date:
+          <input type="date" id="scheduleDate" disabled>
+        </label>
+
+        <label style="font-size:13px;">
+          Time:
+          <input type="time" id="scheduleTime" disabled>
+        </label>
+
+        <span id="schedulePreview" style="font-size:12px; color:#666;"></span>
+      </div>
+
       <button class="send-btn" onclick="sendMessage()">Send</button>
     </div>
   </div>
@@ -214,7 +248,62 @@ function render() {
     : `<span style="color:#888;">No recipients selected.</span>`;
 }
 
-// Dragging logic for dropping employee(s) in the bucket
+/* ---------------------------
+   Scheduling helpers
+---------------------------- */
+function pad2(n){ return String(n).padStart(2, "0"); }
+
+function initScheduleDefaults() {
+  const now = new Date();
+  const dateEl = document.getElementById("scheduleDate");
+  const timeEl = document.getElementById("scheduleTime");
+
+  // default: today + next rounded 5 minutes
+  const rounded = new Date(now.getTime());
+  rounded.setSeconds(0, 0);
+  const mins = rounded.getMinutes();
+  const next5 = mins + (5 - (mins % 5 || 5));
+  rounded.setMinutes(next5);
+
+  dateEl.value = `${rounded.getFullYear()}-${pad2(rounded.getMonth()+1)}-${pad2(rounded.getDate())}`;
+  timeEl.value = `${pad2(rounded.getHours())}:${pad2(rounded.getMinutes())}`;
+
+  updateSchedulePreview();
+}
+
+function onScheduleToggle() {
+  const enabled = document.getElementById("scheduleEnabled").checked;
+  document.getElementById("scheduleDate").disabled = !enabled;
+  document.getElementById("scheduleTime").disabled = !enabled;
+  updateSchedulePreview();
+}
+
+function updateSchedulePreview() {
+  const enabled = document.getElementById("scheduleEnabled").checked;
+  const preview = document.getElementById("schedulePreview");
+  if (!enabled) { preview.textContent = ""; return; }
+
+  const sendAt = getScheduledDateTime();
+  preview.textContent = sendAt
+    ? `Will send: ${sendAt.toLocaleString()}`
+    : `Pick a date and time.`;
+}
+
+// Returns a Date or null
+function getScheduledDateTime() {
+  const dateStr = document.getElementById("scheduleDate").value; // YYYY-MM-DD
+  const timeStr = document.getElementById("scheduleTime").value; // HH:MM
+  if (!dateStr || !timeStr) return null;
+
+  // Local time
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const [hh, mm] = timeStr.split(":").map(Number);
+  return new Date(y, m - 1, d, hh, mm, 0, 0);
+}
+
+/* ---------------------------
+   Dragging logic for dropping employee(s) in the bucket
+---------------------------- */
 document.getElementById('projectBucket').ondrop = function(e) {
   e.preventDefault();
   let names;
@@ -244,15 +333,42 @@ function sendMessage() {
     alert("Please enter a message before sending.");
     return;
   }
+
+  const scheduleEnabled = document.getElementById("scheduleEnabled").checked;
+  let sendAtISO = null;
+
+  if (scheduleEnabled) {
+    const sendAt = getScheduledDateTime();
+    if (!sendAt) {
+      alert("Please select a date and time to schedule.");
+      return;
+    }
+    if (sendAt.getTime() < Date.now() + 30 * 1000) {
+      alert("Scheduled time must be in the future.");
+      return;
+    }
+    // Use ISO string so FileMaker/script can parse reliably
+    sendAtISO = sendAt.toISOString();
+  }
+
   const recipientData = recipients.map(e => ({ name: e.name, phone: e.phone }));
   const scriptParam = JSON.stringify({
     recipients: recipientData,
-    message
+    message,
+    sendAt: sendAtISO, // null = send now, otherwise scheduled time
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
   });
+
   if (window.FileMaker && typeof window.FileMaker.PerformScript === 'function') {
+    // Keep one script and branch inside it based on sendAt presence
     window.FileMaker.PerformScript("SendSMS", scriptParam);
   }
 }
+
+/* init */
+document.getElementById("scheduleDate").addEventListener("change", updateSchedulePreview);
+document.getElementById("scheduleTime").addEventListener("change", updateSchedulePreview);
+initScheduleDefaults();
 </script>
 </body>
 </html>
