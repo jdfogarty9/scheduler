@@ -326,11 +326,28 @@ document.getElementById('projectBucket').ondrop = function(e) {
 };
 
 function selectAllAvailable() {
-  // Move everyone currently in "available" to "recipients"
-  available.forEach(emp => {
+  const searchValue = (document.getElementById('employeeSearch')?.value || "")
+    .toLowerCase()
+    .trim();
+
+  // Match the same search logic used in render()
+  const matches = [];
+  available.forEach((emp) => {
+    const searchTarget = (emp.name + " " + (emp.phone || "")).toLowerCase();
+    if (!searchValue || searchTarget.includes(searchValue)) {
+      matches.push(emp);
+    }
+  });
+
+  // Move only matching employees into recipients
+  matches.forEach((emp) => {
     if (!recipients.some(r => r.name === emp.name)) recipients.push(emp);
   });
-  available = [];
+
+  // Remove moved employees from available
+  const movedNames = new Set(matches.map(e => e.name));
+  available = available.filter(e => !movedNames.has(e.name));
+
   selectedIndexes = [];
   render();
 }
