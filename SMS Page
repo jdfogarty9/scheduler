@@ -101,6 +101,7 @@
   <div class="container">
     <div class="employee-list">
       <div class="bucket-title">Available Employees</div>
+<button type="button" class="send-btn" style="margin-top:0; margin-bottom:10px; padding:8px 14px; font-size:13px;" onclick="selectAllAvailable()">Select All</button>
       <div class="search-bar">
         <input type="text" id="employeeSearch" placeholder="Search employees..." oninput="render()" autocomplete="off">
       </div>
@@ -109,6 +110,7 @@
 
     <div class="project-bucket" id="projectBucket" ondragover="event.preventDefault()">
       <div class="bucket-title">Recipients</div>
+<button type="button" class="send-btn" style="margin-top:0; margin-bottom:10px; padding:8px 14px; font-size:13px;" onclick="clearRecipients()">Clear names</button>
       <div class="recipients-label">Drag employees here</div>
       <div id="bucketList"></div>
     </div>
@@ -322,6 +324,26 @@ document.getElementById('projectBucket').ondrop = function(e) {
   selectedIndexes = [];
   render();
 };
+
+function selectAllAvailable() {
+  // Move everyone currently in "available" to "recipients"
+  available.forEach(emp => {
+    if (!recipients.some(r => r.name === emp.name)) recipients.push(emp);
+  });
+  available = [];
+  selectedIndexes = [];
+  render();
+}
+
+function clearRecipients() {
+  // Move everyone from "recipients" back to "available"
+  recipients.forEach(emp => {
+    if (!available.some(a => a.name === emp.name)) available.push(emp);
+  });
+  recipients = [];
+  selectedIndexes = [];
+  render();
+}
 
 function sendMessage() {
   const message = document.getElementById('customMessage').value.trim();
