@@ -255,6 +255,16 @@ function render() {
 ---------------------------- */
 function pad2(n){ return String(n).padStart(2, "0"); }
 
+// Returns a local datetime string (YYYY-MM-DDTHH:MM:SS) without UTC conversion
+function toLocalISOString(date) {
+  return date.getFullYear()
+    + "-" + pad2(date.getMonth() + 1)
+    + "-" + pad2(date.getDate())
+    + "T" + pad2(date.getHours())
+    + ":" + pad2(date.getMinutes())
+    + ":" + pad2(date.getSeconds());
+}
+
 function initScheduleDefaults() {
   const now = new Date();
   const dateEl = document.getElementById("scheduleDate");
@@ -386,8 +396,8 @@ function sendMessage() {
       alert("Scheduled time must be in the future.");
       return;
     }
-    // Use ISO string so FileMaker/script can parse reliably
-    sendAtISO = sendAt.toISOString();
+    // Use local datetime string so FileMaker receives the user's local time
+    sendAtISO = toLocalISOString(sendAt);
   }
 
   const recipientData = recipients.map(e => ({ name: e.name, phone: e.phone }));
