@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Chart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+        }
+        
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+        }
+        
+        h2 {
+            font-size: clamp(12px, 3vw, 18px);
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        
+        .subtitle {
+            font-size: clamp(10px, 2vw, 12px);
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+            gap: clamp(12px, 3vw, 24px);
+            padding-bottom: 8px;
+            min-height: 0;
+        }
+        
+        .month-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 0;
+        }
+        
+        .bar-pair {
+            display: flex;
+            gap: 2px;
+            align-items: flex-end;
+            width: 60%;
+            height: 100%;
+            padding-bottom: 4px;
+        }
+        
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            min-width: 0;
+        }
+        
+        .value {
+            font-weight: 600;
+            font-size: clamp(9px, 1.8vw, 13px);
+            color: #333;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
+        
+        .bar-box {
+            width: 100%;
+            border-radius: 2px 2px 0 0;
+            transition: opacity 0.2s;
+            min-height: 10px;
+        }
+        
+        .bar-blue {
+            background: linear-gradient(to bottom, #4a90e2, #357abd);
+        }
+        
+        .bar-orange {
+            background: linear-gradient(to bottom, #ff9f43, #ee5a24);
+        }
+        
+        .bar-item:hover .bar-box {
+            opacity: 0.8;
+        }
+        
+        .month {
+            margin-top: 4px;
+            font-size: clamp(8px, 1.5vw, 11px);
+            color: #666;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 4px 4px 4px;
+            flex-shrink: 0;
+        }
+        
+        .legend {
+            display: flex;
+            gap: clamp(8px, 2vw, 16px);
+            font-size: clamp(9px, 1.8vw, 12px);
+            color: #666;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .color-box {
+            width: clamp(10px, 2vw, 14px);
+            height: clamp(10px, 2vw, 14px);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        
+        .color-blue {
+            background: linear-gradient(to bottom, #4a90e2, #357abd);
+        }
+        
+        .color-orange {
+            background: linear-gradient(to bottom, #ff9f43, #ee5a24);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>TBD</h2>
+        <div class="subtitle">TBD</div>
+        
+        <div class="bars" id="barChart"></div>
+        
+        <div class="footer">
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="color-box color-blue"></div>
+                    <span>TBD</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box color-orange"></div>
+                    <span>TBD</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            { month: 'Project 1', value1: 30, value2: 45 },
+            { month: 'Project 2', value1: 88, value2: 65 },
+            { month: 'Project 3', value1: 42, value2: 70 },
+            { month: 'Project 4', value1: 95, value2: 80 },
+            { month: 'Project 5', value1: 65, value2: 55 },
+            { month: 'Project 6', value1: 55, value2: 90 }
+        ];
+
+        function drawChart() {
+            const container = document.getElementById('barChart');
+            const allValues = data.flatMap(d => [d.value1, d.value2]);
+            const max = Math.max(...allValues);
+            
+            const containerHeight = container.clientHeight - 30;
+            
+            container.innerHTML = '';
+            
+            data.forEach(item => {
+                const group = document.createElement('div');
+                group.className = 'month-group';
+                
+                const barPair = document.createElement('div');
+                barPair.className = 'bar-pair';
+                
+                // Blue bar
+                const col1 = document.createElement('div');
+                col1.className = 'bar-item';
+                
+                const val1 = document.createElement('div');
+                val1.className = 'value';
+                val1.textContent = item.value1;
+                
+                const bar1 = document.createElement('div');
+                bar1.className = 'bar-box bar-blue';
+                const height1 = Math.max((item.value1 / max) * containerHeight, 10);
+                bar1.style.height = height1 + 'px';
+                
+                col1.appendChild(val1);
+                col1.appendChild(bar1);
+                col1.onclick = function() {
+                    alert(item.month + ' (Blue): ' + item.value1);
+                };
+                
+                // Orange bar
+                const col2 = document.createElement('div');
+                col2.className = 'bar-item';
+                
+                const val2 = document.createElement('div');
+                val2.className = 'value';
+                val2.textContent = item.value2;
+                
+                const bar2 = document.createElement('div');
+                bar2.className = 'bar-box bar-orange';
+                const height2 = Math.max((item.value2 / max) * containerHeight, 10);
+                bar2.style.height = height2 + 'px';
+                
+                col2.appendChild(val2);
+                col2.appendChild(bar2);
+                col2.onclick = function() {
+                    alert(item.month + ' (Orange): ' + item.value2);
+                };
+                
+                barPair.appendChild(col1);
+                barPair.appendChild(col2);
+                
+                const label = document.createElement('div');
+                label.className = 'month';
+                label.textContent = item.month;
+                
+                group.appendChild(barPair);
+                group.appendChild(label);
+                
+                container.appendChild(group);
+            });
+        }
+
+        drawChart();
+        
+        window.addEventListener('resize', drawChart);
+    </script>
+</body>
+</html>
