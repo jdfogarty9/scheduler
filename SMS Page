@@ -1,34 +1,423 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <script>
-        function clearRecipients() {
-            // existing implementation
-        }
+  <meta charset="UTF-8">
+  <title>Send Custom Message to Employees</title>
+  <style>
+    body { background: #f4f4f4; font-family: Arial, sans-serif; margin: 0; padding: 30px; }
+    h2 { margin-top: 0; }
+    .container {
+      display: flex;
+      flex-direction: row;
+      gap: 48px;
+      align-items: flex-start;
+      width: 100%;
+      box-sizing: border-box;
+      justify-content: flex-start;
+    }
+    .employee-list {
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 6px #0001;
+      padding: 18px;
+      min-width: 340px; width: 340px;
+      box-sizing: border-box;
+      display: flex; flex-direction: column;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .project-bucket {
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 6px #0001;
+      padding: 18px;
+      min-width: 320px; width: 320px;
+      box-sizing: border-box;
+      display: flex; flex-direction: column; min-height: 350px;
+      margin-left: 0; margin-right: 0;
+    }
+    .message-area {
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 6px #0001;
+      padding: 18px;
+      min-width: 640px; width: 640px; /* wider! */
+      box-sizing: border-box; display: flex; flex-direction: column;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .bucket-title { font-weight: bold; font-size: 18px; margin-bottom: 8px; }
+    .recipients-label { font-size: 13px; color: #888; margin-bottom: 8px; }
+    .search-bar {
+      margin-bottom: 10px; width: 100%;
+    }
+    .search-bar input {
+      width: 100%; padding: 6px 10px;
+      border-radius: 4px; border: 1px solid #bbb;
+      font-size: 14px; margin-bottom: 6px; box-sizing: border-box;
+    }
+    .employee {
+      background: #e3e3e3; border-radius: 6px; padding: 7px 9px; margin: 7px 0;
+      cursor: pointer; user-select: none; display: flex; align-items: center;
+      border: 2px solid transparent;
+      transition: border 0.1s;
+      font-size: 12px; /* smaller font for employee names */
+      font-family: 'Segoe UI', Arial, sans-serif;
+      letter-spacing: 0.01em;
+    }
+    .employee.selected {
+      border: 2px solid #1976d2;
+      background: #d1eaff;
+    }
+    .employee.dragged { opacity: 0.5; }
+    textarea {
+      width: 100%;
+      height: 112px; /* double previous 56px */
+      border-radius: 4px; border: 1px solid #bbb;
+      padding: 8px; font-size: 13px; margin-top: 8px;
+      box-sizing: border-box; resize: vertical; min-height: 72px; max-height: 300px;
+    }
+    .recipient-list { font-size: 12px; color: #222; margin-top: 12px; }
 
-        function selectAllAvailable() {
-            const employees = document.querySelectorAll('.employee');
-            const filteredEmployees = Array.from(employees).filter(employee => {
-                // Assuming #employeeSearch is an input to filter employee names
-                const searchTerm = document.querySelector('#employeeSearch').value.toLowerCase();
-                return employee.textContent.toLowerCase().includes(searchTerm);
-            });
-            // Move filtered employees to recipients
-            filteredEmployees.forEach(employee => {
-                // Code to move employee to recipients
-                // Code to remove employee from available
-            });
-            // Re-render logic
-        }
-    </script>
+    /* schedule inputs */
+    .message-area input[type="date"],
+    .message-area input[type="time"]{
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      font-size: 13px;
+    }
+
+    .send-btn {
+      margin-top: 18px; padding: 10px 24px;
+      background: #1976d2; color: #fff; border: none; border-radius: 5px;
+      font-size: 15px; cursor: pointer; transition: background 0.2s;
+    }
+    .send-btn:hover { background: #1251a2; }
+    @media (max-width: 1500px) {
+      .container { flex-direction: column; min-width: 0; gap: 20px;}
+      .employee-list, .project-bucket, .message-area { width: 100%; min-width: 0; max-width: unset; }
+      .project-bucket { margin: 0 0 20px 0; }
+      .message-area { margin-top: 20px; }
+    }
+  </style>
 </head>
 <body>
-    <button onclick="selectAllAvailable()">Select All</button>
-    <button onclick="clearRecipients()">Clear names</button>
-    <div id="availableEmployees">
-        <!-- Available employees will be listed here -->
+  <h2>Send Custom Message</h2>
+  <div class="container">
+    <div class="employee-list">
+      <div class="bucket-title">Available Employees</div>
+<button type="button" class="send-btn" style="margin-top:0; margin-bottom:10px; padding:8px 14px; font-size:13px;" onclick="selectAllAvailable()">Select All</button>
+      <div class="search-bar">
+        <input type="text" id="employeeSearch" placeholder="Search employees..." oninput="render()" autocomplete="off">
+      </div>
+      <div id="employeePool"></div>
     </div>
-    <div id="recipients">
-        <!-- Selected recipients will be listed here -->
+
+    <div class="project-bucket" id="projectBucket" ondragover="event.preventDefault()">
+      <div class="bucket-title">Recipients</div>
+<button type="button" class="send-btn" style="margin-top:0; margin-bottom:10px; padding:8px 14px; font-size:13px;" onclick="clearRecipients()">Clear names</button>
+      <div class="recipients-label">Drag employees here</div>
+      <div id="bucketList"></div>
     </div>
+
+    <div class="message-area">
+      <label for="customMessage"><b>Custom Message</b></label>
+      <textarea id="customMessage" placeholder="Write your message here..."></textarea>
+
+      <div class="recipient-list" id="recipientList"></div>
+
+      <!-- Schedule controls -->
+      <div style="margin-top:12px; display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+          <input type="checkbox" id="scheduleEnabled" onchange="onScheduleToggle()">
+          Schedule send
+        </label>
+
+        <label style="font-size:13px;">
+          Date:
+          <input type="date" id="scheduleDate" disabled>
+        </label>
+
+        <label style="font-size:13px;">
+          Time:
+          <input type="time" id="scheduleTime" disabled>
+        </label>
+
+        <span id="schedulePreview" style="font-size:12px; color:#666;"></span>
+      </div>
+
+      <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+<script>
+let employees = [];
+let available = [];
+let recipients = [];
+let selectedIndexes = [];
+
+// Function to load employees from JSON string (replace employees and reset state)
+async function loadDataSMS(employeesJsonSMS) {
+  try {
+    employees = JSON.parse(employeesJsonSMS);
+    available = [...employees];
+    recipients = [];
+    selectedIndexes = [];
+    render();
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
+}
+
+function render() {
+  const searchValue = (document.getElementById('employeeSearch')?.value || "").toLowerCase().trim();
+  const pool = document.getElementById('employeePool');
+  pool.innerHTML = '';
+
+  const filteredAvailable = [];
+  const availableMapIdx = [];
+  available.forEach((emp, i) => {
+    const searchTarget = (emp.name + " " + (emp.PC || "") + " " + (emp.phone || "")).toLowerCase();
+    if (!searchValue || searchTarget.includes(searchValue)) {
+      filteredAvailable.push(emp);
+      availableMapIdx.push(i);
+    }
+  });
+
+  filteredAvailable.forEach((emp, idx) => {
+    const realIdx = availableMapIdx[idx];
+    const div = document.createElement('div');
+    div.className = 'employee';
+    if (selectedIndexes.includes(realIdx)) div.classList.add('selected');
+    div.textContent = emp.name + (emp.PC ? " [" + emp.PC + "]" : "") + (emp.phone ? " (" + emp.phone + ")" : "");
+    div.setAttribute('draggable', true);
+
+    // Selection logic
+    div.onclick = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (selectedIndexes.includes(realIdx)) {
+          selectedIndexes = selectedIndexes.filter(idx2 => idx2 !== realIdx);
+        } else {
+          selectedIndexes.push(realIdx);
+        }
+      } else if (e.shiftKey) {
+        if (selectedIndexes.length > 0) {
+          let last = selectedIndexes[selectedIndexes.length - 1];
+          let [start, end] = [Math.min(last, realIdx), Math.max(last, realIdx)];
+          selectedIndexes = [];
+          for (let j = start; j <= end; j++) selectedIndexes.push(j);
+        } else {
+          selectedIndexes = [realIdx];
+        }
+      } else {
+        selectedIndexes = [realIdx];
+      }
+      render();
+      e.stopPropagation();
+    };
+
+    // Drag logic
+    div.ondragstart = (e) => {
+      if (!selectedIndexes.includes(realIdx)) selectedIndexes = [realIdx];
+      div.classList.add('dragged');
+      let names = selectedIndexes.map(idx3 => available[idx3].name);
+      e.dataTransfer.setData('application/json', JSON.stringify(names));
+    };
+    div.ondragend = () => div.classList.remove('dragged');
+    pool.appendChild(div);
+  });
+
+  // Deselect on background click
+  pool.parentElement.onclick = function(e) {
+    if (e.target === pool.parentElement) {
+      selectedIndexes = [];
+      render();
+    }
+  };
+
+  // Recipients in bucket
+  const bucket = document.getElementById('bucketList');
+  bucket.innerHTML = '';
+  recipients.forEach(emp => {
+    const div = document.createElement('div');
+    div.className = 'employee';
+    div.textContent = emp.name + (emp.PC ? " [" + emp.PC + "]" : "") + (emp.phone ? " (" + emp.phone + ")" : "");
+    div.onclick = () => {
+      available.push(emp);
+      recipients = recipients.filter(e => e.name !== emp.name);
+      render();
+    };
+    bucket.appendChild(div);
+  });
+
+  document.getElementById('recipientList').innerHTML = recipients.length
+    ? `<b>Recipients:</b> ${recipients.map(e => e.name + (e.PC ? " [" + e.PC + "]" : "") + (e.phone ? " (" + e.phone + ")" : "")).join(', ')}`
+    : `<span style="color:#888;">No recipients selected.</span>`;
+}
+
+/* ---------------------------
+   Scheduling helpers
+---------------------------- */
+function pad2(n){ return String(n).padStart(2, "0"); }
+
+// Returns a local datetime string (YYYY-MM-DDTHH:MM:SS) without UTC conversion
+function toLocalISOString(date) {
+  return date.getFullYear()
+    + "-" + pad2(date.getMonth() + 1)
+    + "-" + pad2(date.getDate())
+    + "T" + pad2(date.getHours())
+    + ":" + pad2(date.getMinutes())
+    + ":" + pad2(date.getSeconds());
+}
+
+function initScheduleDefaults() {
+  const now = new Date();
+  const dateEl = document.getElementById("scheduleDate");
+  const timeEl = document.getElementById("scheduleTime");
+
+  // default: today + next rounded 5 minutes
+  const rounded = new Date(now.getTime());
+  rounded.setSeconds(0, 0);
+  const mins = rounded.getMinutes();
+  const next5 = mins + (5 - (mins % 5 || 5));
+  rounded.setMinutes(next5);
+
+  dateEl.value = `${rounded.getFullYear()}-${pad2(rounded.getMonth()+1)}-${pad2(rounded.getDate())}`;
+  timeEl.value = `${pad2(rounded.getHours())}:${pad2(rounded.getMinutes())}`;
+
+  updateSchedulePreview();
+}
+
+function onScheduleToggle() {
+  const enabled = document.getElementById("scheduleEnabled").checked;
+  document.getElementById("scheduleDate").disabled = !enabled;
+  document.getElementById("scheduleTime").disabled = !enabled;
+  updateSchedulePreview();
+}
+
+function updateSchedulePreview() {
+  const enabled = document.getElementById("scheduleEnabled").checked;
+  const preview = document.getElementById("schedulePreview");
+  if (!enabled) { preview.textContent = ""; return; }
+
+  const sendAt = getScheduledDateTime();
+  preview.textContent = sendAt
+    ? `Will send: ${sendAt.toLocaleString()}`
+    : `Pick a date and time.`;
+}
+
+// Returns a Date or null
+function getScheduledDateTime() {
+  const dateStr = document.getElementById("scheduleDate").value; // YYYY-MM-DD
+  const timeStr = document.getElementById("scheduleTime").value; // HH:MM
+  if (!dateStr || !timeStr) return null;
+
+  // Local time
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const [hh, mm] = timeStr.split(":").map(Number);
+  return new Date(y, m - 1, d, hh, mm, 0, 0);
+}
+
+/* ---------------------------
+   Dragging logic for dropping employee(s) in the bucket
+---------------------------- */
+document.getElementById('projectBucket').ondrop = function(e) {
+  e.preventDefault();
+  let names;
+  try {
+    names = JSON.parse(e.dataTransfer.getData('application/json'));
+  } catch { names = []; }
+  if (!names || !Array.isArray(names)) return;
+
+  names.forEach(name => {
+    const idx = available.findIndex(e => e.name === name);
+    if (idx !== -1 && !recipients.some(e => e.name === name)) {
+      recipients.push(available[idx]);
+    }
+  });
+  available = available.filter(e => !names.includes(e.name));
+  selectedIndexes = [];
+  render();
+};
+
+function selectAllAvailable() {
+  const searchValue = (document.getElementById('employeeSearch')?.value || "")
+    .toLowerCase()
+    .trim();
+
+  // match the same logic used in render()
+  const matches = [];
+  available.forEach((emp) => {
+    const searchTarget = (emp.name + " " + (emp.PC || "") + " " + (emp.phone || "")).toLowerCase();
+    if (!searchValue || searchTarget.includes(searchValue)) {
+      matches.push(emp);
+    }
+  });
+
+  // move only matches to recipients
+  matches.forEach((emp) => {
+    if (!recipients.some(r => r.name === emp.name)) recipients.push(emp);
+  });
+
+  // remove moved from available
+  const movedNames = new Set(matches.map(e => e.name));
+  available = available.filter(e => !movedNames.has(e.name));
+
+  selectedIndexes = [];
+  render();
+}
+
+function clearRecipients() {
+  // Move everyone from "recipients" back to "available"
+  recipients.forEach(emp => {
+    if (!available.some(a => a.name === emp.name)) available.push(emp);
+  });
+  recipients = [];
+  selectedIndexes = [];
+  render();
+}
+
+function sendMessage() {
+  const message = document.getElementById('customMessage').value.trim();
+  if (recipients.length === 0) {
+    alert("Please select at least one recipient.");
+    return;
+  }
+  if (!message) {
+    alert("Please enter a message before sending.");
+    return;
+  }
+
+  const scheduleEnabled = document.getElementById("scheduleEnabled").checked;
+  let sendAtISO = null;
+
+  if (scheduleEnabled) {
+    const sendAt = getScheduledDateTime();
+    if (!sendAt) {
+      alert("Please select a date and time to schedule.");
+      return;
+    }
+    if (sendAt.getTime() < Date.now() + 30 * 1000) {
+      alert("Scheduled time must be in the future.");
+      return;
+    }
+    // Use local datetime string so FileMaker receives the user's local time
+    sendAtISO = toLocalISOString(sendAt);
+  }
+
+  const recipientData = recipients.map(e => ({ name: e.name, phone: e.phone }));
+  const scriptParam = JSON.stringify({
+    recipients: recipientData,
+    message,
+    sendAt: sendAtISO, // null = send now, otherwise scheduled time
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  });
+
+  if (window.FileMaker && typeof window.FileMaker.PerformScript === 'function') {
+    // Keep one script and branch inside it based on sendAt presence
+    window.FileMaker.PerformScript("SendSMS", scriptParam);
+  }
+}
+
+/* init */
+document.getElementById("scheduleDate").addEventListener("change", updateSchedulePreview);
+document.getElementById("scheduleTime").addEventListener("change", updateSchedulePreview);
+initScheduleDefaults();
+</script>
 </body>
 </html>
